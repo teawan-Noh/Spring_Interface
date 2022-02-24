@@ -125,7 +125,13 @@
 		    <version>3.9</version>
 		</dependency>
 		
-		     
+		<!-- EduVo의 데이터 전송객체(DTO/VO)를 생성자/getter/setter 등을 Annotation을 통해 사용가능 -->
+		<dependency>
+		    <groupId>org.projectlombok</groupId>
+		    <artifactId>lombok</artifactId>
+		    <version>1.18.12</version>
+		</dependency>
+		
 	</dependencies>
 	
     <build>
