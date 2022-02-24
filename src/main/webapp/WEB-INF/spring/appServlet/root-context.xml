@@ -1,8 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd">
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
 	
-	<!-- Root Context: defines shared resources visible to all other web components -->
+	<!-- db 접속정보 Properties 파일 읽어옴 -->		
+	<context:property-placeholder location="properties/db.properties"/>
+	
+	<!-- 접속정보 객체 BasicDataSource bean 생성 	-->		
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="${driver}"/>
+		<property name="url" value="${url}"/>
+		<property name="username" value="{username}"/>
+		<property name="password" value="${password}"/>
+	</bean>
+	
+	<!-- 
+		Mybatis SqlSessionFactory bean 생성 
+		mybatis-spring.jar
+		mybatis.jar 필요함
 		
+		mybatis 두개의 정보 필요 1)접속정보 2)mybatis에서 사용하는 환경 (Alias, Setting, Mapper)
+	-->		
+	<bean id="sqlSessionFactoryBean" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"/>
+		<property name="configLocation" value="classpath:mybatis/configuration.xml"/>
+	</bean>
+	
+	<!-- Spring DI(의존적 주입)을 위한 SqlSessionTemple bean 생성 -->		
+	<bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg ref="sqlSessionFactoryBean"/>
+	</bean>
+	
+	<!-- 
+		tx Transaction을 위한 TransactionManager 생성 
+		1) Annotation을 위한 설정 => servlet-context.xml에 <tx:annotation-driven>이 필요
+		2) AOP로 설정할 경우 => advice(실행되는 메소드), pointcut(실행되는 곳)
+	-->		
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
 </beans>
